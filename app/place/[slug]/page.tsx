@@ -39,6 +39,7 @@ export default async function PlacePage({
                 {place.category === 'Bar' && '🍺'}
                 {place.category === 'Restaurant' && '🍽️'}
                 {place.category === 'Spa' && '♨️'}
+                {place.category === 'Museum' && '🏛️'}
               </div>
               <p className="text-sm opacity-80">Photo coming soon</p>
             </div>
