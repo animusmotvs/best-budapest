@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { supabase } from '@/lib/supabase'
 import { getPlaceImage } from '@/lib/unsplash'
+import FavoriteButton from '@/components/FavoriteButton'
 
 interface Place {
   id: string
@@ -280,81 +281,84 @@ export default function HomePage() {
         {filteredPlaces.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredPlaces.map((place) => (
-              <Link 
-                key={place.id}
-                href={`/place/${place.slug}`}
-                className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group"
-              >
-                {/* Image */}
-                <div className="h-48 relative overflow-hidden">
-                  {place.imageUrl ? (
-                    <Image
-                      src={place.imageUrl}
-                      alt={place.name}
-                      fill
-                      className="object-cover group-hover:scale-110 transition-transform duration-300"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    />
-                  ) : (
-                    <div className="h-full bg-gradient-to-r from-blue-400 to-purple-500 flex items-center justify-center">
-                      <span className="text-6xl">
-                        {place.category === 'Cafe' && '☕'}
-                        {place.category === 'Bar' && '🍺'}
-                        {place.category === 'Restaurant' && '🍽️'}
-                        {place.category === 'Spa' && '♨️'}
-                        {place.category === 'Museum' && '🏛️'}
-                        {place.category === 'Bakery' && '🥐'}
-                        {place.category === 'Market' && '🛒'}
-                        {place.category === 'Shopping Mall' && '🛍️'}
-                        {place.category === 'Fitness' && '💪'}
-                        {place.category === 'School' && '🎓'}
-                        {!['Cafe', 'Bar', 'Restaurant', 'Spa', 'Museum', 'Bakery', 'Market', 'Shopping Mall', 'Fitness', 'School'].includes(place.category) && '📍'}
-                      </span>
-                    </div>
-                  )}
-                </div>
+              <div key={place.id} className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group relative">
+                <Link href={`/place/${place.slug}`}>
+                  {/* Image */}
+                  <div className="h-48 relative overflow-hidden">
+                    {place.imageUrl ? (
+                      <Image
+                        src={place.imageUrl}
+                        alt={place.name}
+                        fill
+                        className="object-cover group-hover:scale-110 transition-transform duration-300"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      />
+                    ) : (
+                      <div className="h-full bg-gradient-to-r from-blue-400 to-purple-500 flex items-center justify-center">
+                        <span className="text-6xl">
+                          {place.category === 'Cafe' && '☕'}
+                          {place.category === 'Bar' && '🍺'}
+                          {place.category === 'Restaurant' && '🍽️'}
+                          {place.category === 'Spa' && '♨️'}
+                          {place.category === 'Museum' && '🏛️'}
+                          {place.category === 'Bakery' && '🥐'}
+                          {place.category === 'Market' && '🛒'}
+                          {place.category === 'Shopping Mall' && '🛍️'}
+                          {place.category === 'Fitness' && '💪'}
+                          {place.category === 'School' && '🎓'}
+                          {!['Cafe', 'Bar', 'Restaurant', 'Spa', 'Museum', 'Bakery', 'Market', 'Shopping Mall', 'Fitness', 'School'].includes(place.category) && '📍'}
+                        </span>
+                      </div>
+                    )}
+                  </div>
 
-                <div className="p-6">
-                  <h3 className="font-bold text-xl mb-3 group-hover:text-blue-600 transition">
-                    {place.name}
-                  </h3>
-                  
-                  {/* Rating */}
-                  {place.google_rating && (
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="text-yellow-500 text-2xl">★</span>
-                      <span className="font-bold text-xl">{place.google_rating}</span>
-                      <span className="text-gray-500 text-sm">/ 5.0</span>
-                    </div>
-                  )}
+                  <div className="p-6">
+                    <h3 className="font-bold text-xl mb-3 group-hover:text-blue-600 transition">
+                      {place.name}
+                    </h3>
+                    
+                    {/* Rating */}
+                    {place.google_rating && (
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="text-yellow-500 text-2xl">★</span>
+                        <span className="font-bold text-xl">{place.google_rating}</span>
+                        <span className="text-gray-500 text-sm">/ 5.0</span>
+                      </div>
+                    )}
 
-                  {/* Category Badge */}
-                  <span className="inline-block bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full mb-3">
-                    {place.category}
-                  </span>
-
-                  {/* Cuisine Badge */}
-                  {place.cuisine && (
-                    <span className="inline-block bg-purple-100 text-purple-800 text-sm px-3 py-1 rounded-full mb-3 ml-2">
-                      {place.cuisine}
+                    {/* Category Badge */}
+                    <span className="inline-block bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full mb-3">
+                      {place.category}
                     </span>
-                  )}
 
-                  {/* Address */}
-                  {place.address && (
-                    <p className="text-gray-600 text-sm mb-3">
-                      📍 {place.address}
-                    </p>
-                  )}
+                    {/* Cuisine Badge */}
+                    {place.cuisine && (
+                      <span className="inline-block bg-purple-100 text-purple-800 text-sm px-3 py-1 rounded-full mb-3 ml-2">
+                        {place.cuisine}
+                      </span>
+                    )}
 
-                  {/* Description */}
-                  {place.description && (
-                    <p className="text-gray-700 line-clamp-2">
-                      {place.description}
-                    </p>
-                  )}
+                    {/* Address */}
+                    {place.address && (
+                      <p className="text-gray-600 text-sm mb-3">
+                        📍 {place.address}
+                      </p>
+                    )}
+
+                    {/* Description */}
+                    {place.description && (
+                      <p className="text-gray-700 line-clamp-2">
+                        {place.description}
+                      </p>
+                    )}
+                  </div>
+                </Link>
+                
+                {/* Favorite Button - Absolute positioned in top-right */}
+                <div className="absolute top-3 right-3 z-20 bg-white rounded-full p-2 shadow-lg hover:shadow-xl transition-shadow">
+                  <FavoriteButton placeId={place.id} />
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
         ) : (
