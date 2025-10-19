@@ -15,15 +15,45 @@ interface Place {
   description: string | null
   slug: string
   imageUrl?: string | null
+  cuisine?: string | null
 }
 
-const CATEGORIES = ['All', 'Cafe', 'Restaurant', 'Bar', 'Spa', 'Museum', 'Bakery', 'Market', 'Memorial', 'Attraction', 'District']
+const CATEGORIES = [
+  'All', 
+  'Cafe', 
+  'Restaurant', 
+  'Bar', 
+  'Spa', 
+  'Museum', 
+  'Bakery', 
+  'Market', 
+  'Memorial', 
+  'Attraction', 
+  'District',
+  'Shopping Mall',
+  'Fitness',
+  'School'
+]
+
+const CUISINES = [
+  'All',
+  'Afghan',
+  'Albanian', 
+  'American',
+  'Arabic',
+  'Argentinian',
+  'Armenian',
+  'Asian',
+  'Japanese',
+  'Fusion'
+]
 
 export default function HomePage() {
   const [places, setPlaces] = useState<Place[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('All')
+  const [selectedCuisine, setSelectedCuisine] = useState('All')
   const [minRating, setMinRating] = useState(0)
 
   // Adatok lekérése Supabase-ből + képek Unsplash-ből
@@ -65,11 +95,12 @@ export default function HomePage() {
         (place.description && place.description.toLowerCase().includes(searchQuery.toLowerCase()))
 
       const matchesCategory = selectedCategory === 'All' || place.category === selectedCategory
+      const matchesCuisine = selectedCuisine === 'All' || (place.cuisine && place.cuisine === selectedCuisine)
       const matchesRating = !place.google_rating || place.google_rating >= minRating
 
-      return matchesSearch && matchesCategory && matchesRating
+      return matchesSearch && matchesCategory && matchesCuisine && matchesRating
     })
-  }, [places, searchQuery, selectedCategory, minRating])
+  }, [places, searchQuery, selectedCategory, selectedCuisine, minRating])
 
   // Loading állapot
   if (loading) {
@@ -90,10 +121,10 @@ export default function HomePage() {
       <section className="bg-gradient-to-r from-blue-600 to-purple-700 text-white py-20">
         <div className="max-w-5xl mx-auto px-4 text-center">
           <h1 className="text-5xl md:text-6xl font-bold mb-4">
-            🏛️ Budapest Prime
+            Discover Budapest's Prime Places
           </h1>
           <p className="text-xl md:text-2xl mb-8 opacity-90">
-            Discover the best things to do in Budapest, scored by public reviews and expert tastings
+            The city's finest restaurants, spots and sights, rated by locals and refined by experts
           </p>
 
           {/* KERESŐSÁV */}
@@ -143,6 +174,26 @@ export default function HomePage() {
             </div>
           </div>
 
+          {/* Konyha szerinti szűrés */}
+          <div className="mb-4">
+            <h3 className="text-sm font-semibold text-gray-600 mb-2">Browse by Cuisine</h3>
+            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+              {CUISINES.map(cuisine => (
+                <button
+                  key={cuisine}
+                  onClick={() => setSelectedCuisine(cuisine)}
+                  className={`px-4 py-2 rounded-full font-medium whitespace-nowrap transition-all ${
+                    selectedCuisine === cuisine
+                      ? 'bg-purple-600 text-white shadow-lg scale-105'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  {cuisine === 'All' && '🍽️'} {cuisine}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Értékelés Szűrők */}
           <div>
             <h3 className="text-sm font-semibold text-gray-600 mb-2">Minimum Rating</h3>
@@ -168,6 +219,16 @@ export default function HomePage() {
                 ⭐ 4.0+
               </button>
               <button
+                onClick={() => setMinRating(4.3)}
+                className={`px-4 py-2 rounded-full font-medium transition ${
+                  minRating === 4.3
+                    ? 'bg-yellow-500 text-white shadow-lg'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                ⭐ 4.3+
+              </button>
+              <button
                 onClick={() => setMinRating(4.5)}
                 className={`px-4 py-2 rounded-full font-medium transition ${
                   minRating === 4.5
@@ -176,6 +237,16 @@ export default function HomePage() {
                 }`}
               >
                 ⭐ 4.5+
+              </button>
+              <button
+                onClick={() => setMinRating(4.7)}
+                className={`px-4 py-2 rounded-full font-medium transition ${
+                  minRating === 4.7
+                    ? 'bg-yellow-500 text-white shadow-lg'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                ⭐ 4.7+
               </button>
             </div>
           </div>
@@ -190,11 +261,12 @@ export default function HomePage() {
           <h2 className="text-3xl font-bold text-gray-900">
             {filteredPlaces.length} Places Found
           </h2>
-          {(searchQuery || selectedCategory !== 'All' || minRating > 0) && (
+          {(searchQuery || selectedCategory !== 'All' || selectedCuisine !== 'All' || minRating > 0) && (
             <button
               onClick={() => {
                 setSearchQuery('')
                 setSelectedCategory('All')
+                setSelectedCuisine('All')
                 setMinRating(0)
               }}
               className="text-blue-600 hover:text-blue-800 font-semibold"
@@ -233,7 +305,10 @@ export default function HomePage() {
                         {place.category === 'Museum' && '🏛️'}
                         {place.category === 'Bakery' && '🥐'}
                         {place.category === 'Market' && '🛒'}
-                        {!['Cafe', 'Bar', 'Restaurant', 'Spa', 'Museum', 'Bakery', 'Market'].includes(place.category) && '📍'}
+                        {place.category === 'Shopping Mall' && '🛍️'}
+                        {place.category === 'Fitness' && '💪'}
+                        {place.category === 'School' && '🎓'}
+                        {!['Cafe', 'Bar', 'Restaurant', 'Spa', 'Museum', 'Bakery', 'Market', 'Shopping Mall', 'Fitness', 'School'].includes(place.category) && '📍'}
                       </span>
                     </div>
                   )}
@@ -257,6 +332,13 @@ export default function HomePage() {
                   <span className="inline-block bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full mb-3">
                     {place.category}
                   </span>
+
+                  {/* Cuisine Badge */}
+                  {place.cuisine && (
+                    <span className="inline-block bg-purple-100 text-purple-800 text-sm px-3 py-1 rounded-full mb-3 ml-2">
+                      {place.cuisine}
+                    </span>
+                  )}
 
                   {/* Address */}
                   {place.address && (
@@ -286,6 +368,7 @@ export default function HomePage() {
               onClick={() => {
                 setSearchQuery('')
                 setSelectedCategory('All')
+                setSelectedCuisine('All')
                 setMinRating(0)
               }}
               className="bg-blue-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-blue-700 transition"
@@ -295,6 +378,86 @@ export default function HomePage() {
           </div>
         )}
       </section>
+
+      {/* FOOTER BROWSE MENU */}
+      <footer className="bg-gray-50 border-t mt-20">
+        <div className="max-w-7xl mx-auto px-4 py-12">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            
+            {/* Browse by Category */}
+            <div>
+              <h3 className="font-bold text-lg mb-4 text-gray-900">Browse by Category</h3>
+              <ul className="space-y-2">
+                {CATEGORIES.slice(1, 8).map(category => (
+                  <li key={category}>
+                    <button
+                      onClick={() => {
+                        setSelectedCategory(category)
+                        window.scrollTo({ top: 0, behavior: 'smooth' })
+                      }}
+                      className="text-gray-600 hover:text-blue-600 transition"
+                    >
+                      {category}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Browse by Cuisine */}
+            <div>
+              <h3 className="font-bold text-lg mb-4 text-gray-900">Browse by Cuisine</h3>
+              <ul className="space-y-2">
+                {CUISINES.slice(1).map(cuisine => (
+                  <li key={cuisine}>
+                    <button
+                      onClick={() => {
+                        setSelectedCuisine(cuisine)
+                        window.scrollTo({ top: 0, behavior: 'smooth' })
+                      }}
+                      className="text-gray-600 hover:text-blue-600 transition"
+                    >
+                      {cuisine}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* More Categories */}
+            <div>
+              <h3 className="font-bold text-lg mb-4 text-gray-900">More Categories</h3>
+              <ul className="space-y-2">
+                {CATEGORIES.slice(8).map(category => (
+                  <li key={category}>
+                    <button
+                      onClick={() => {
+                        setSelectedCategory(category)
+                        window.scrollTo({ top: 0, behavior: 'smooth' })
+                      }}
+                      className="text-gray-600 hover:text-blue-600 transition"
+                    >
+                      {category}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* About */}
+            <div>
+              <h3 className="font-bold text-lg mb-4 text-gray-900">About</h3>
+              <p className="text-gray-600 text-sm mb-4">
+                Discover Budapest's finest places, rated by locals and refined by experts.
+              </p>
+              <p className="text-gray-500 text-xs">
+                © 2024 Budapest Prime. All rights reserved.
+              </p>
+            </div>
+
+          </div>
+        </div>
+      </footer>
     </main>
   )
 }
