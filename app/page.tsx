@@ -122,10 +122,10 @@ export default function HomePage() {
       <section className="bg-gradient-to-r from-blue-600 to-purple-700 text-white py-20">
         <div className="max-w-5xl mx-auto px-4 text-center">
           <h1 className="text-5xl md:text-6xl font-bold mb-4">
-            Discover Budapest's Prime Places
+            Discover Budapest&apos;s Prime Places
           </h1>
           <p className="text-xl md:text-2xl mb-8 opacity-90">
-            The city's finest restaurants, spots and sights, rated by locals and refined by experts
+            The city&apos;s finest restaurants, spots and sights, rated by locals and refined by experts
           </p>
 
           {/* KERESŐSÁV */}
@@ -452,7 +452,7 @@ export default function HomePage() {
             <div>
               <h3 className="font-bold text-lg mb-4 text-gray-900">About</h3>
               <p className="text-gray-600 text-sm mb-4">
-                Discover Budapest's finest places, rated by locals and refined by experts.
+                Discover Budapest&apos;s finest places, rated by locals and refined by experts.
               </p>
               <p className="text-gray-500 text-xs">
                 © 2024 Budapest Prime. All rights reserved.
